@@ -1,0 +1,137 @@
+# Scope and Authorization Document
+## Web/API Security Assessment — OWASP Juice Shop (Local Lab)
+
+| Field | Value |
+|---|---|
+| Document ID | SOA-2026-001 |
+| Assessor | Muhammad Aqib Tayyab |
+| Engagement Type | Self-authorized training assessment (portfolio project) |
+| Target Application | OWASP Juice Shop |
+| Environment | Local, isolated, non-production |
+| Status | Draft — to be finalized before testing begins |
+
+---
+
+## 1. Purpose
+
+This document defines the boundaries, rules, and authorization for a security assessment
+of a local instance of OWASP Juice Shop. Juice Shop is an intentionally vulnerable
+web application published by OWASP specifically for security training and tool
+testing. This document exists to demonstrate professional pre-engagement practice —
+in a real client engagement, no testing occurs before a signed document like this
+exists.
+
+## 2. Authorization Statement
+
+OWASP Juice Shop is distributed under the MIT license explicitly for the purpose of
+security testing, training, and tool evaluation. Running and testing a local instance
+on hardware I own does not require third-party permission. This document itself
+serves as my self-authorization record and stands in for the client sign-off that
+would be required in a real paid engagement.
+
+**No testing in this project will be performed against:**
+- Any system I do not own or control.
+- Any publicly hosted instance of Juice Shop.
+- Any production system.
+- Any third party without a separate, explicit, written authorization.
+
+## 3. Target Description
+
+| Attribute | Detail |
+|---|---|
+| Application | OWASP Juice Shop |
+| Deployment method | Docker container, local host only |
+| Hosting | `localhost` / `127.0.0.1`, no external exposure |
+| Data | 100% synthetic — seeded demo data + test accounts I create |
+| Network exposure | None — container port bound to loopback interface only |
+
+## 4. In Scope
+
+- The Juice Shop web application (all client-side pages and workflows).
+- All Juice Shop REST/API endpoints reachable from the running container.
+- Authentication workflows: registration, login, logout, password reset, session handling.
+- Authorization boundaries: horizontal (user-to-user) and vertical (user-to-admin).
+- Input validation across forms, search, file upload, and API parameters.
+- Business logic flows: shopping basket, checkout, coupons, order handling.
+- HTTP security headers and cookie/session attributes.
+- Client-side code (JavaScript) shipped to the browser, for source review only.
+
+## 5. Out of Scope
+
+- The host operating system, kernel, or filesystem outside the container.
+- The Docker Engine / Docker Desktop installation itself.
+- Any third-party service Juice Shop may reference or link to externally.
+- Any other application, container, or service running on the same machine or network.
+- Denial-of-service, resource-exhaustion, or availability-impacting testing.
+- Destructive testing that would corrupt the container beyond an easy restart.
+- Physical security, social engineering, or phishing (not applicable to this app).
+- Automated scanning at aggressive/high-thread rates against the local instance
+  (not needed for this exercise and avoided as a professional habit).
+
+## 6. Rules of Engagement
+
+1. All testing occurs only while the Juice Shop container is running locally under
+   my control.
+2. All test accounts are created by me for this purpose and use fabricated,
+   non-reused credentials and fabricated PII (e.g., `testuser-a@example.local`).
+3. No real personal data, real payment data, or real credentials of any kind will
+   ever be entered into the target application.
+4. No exploitation will extend beyond what is necessary to prove and document a
+   vulnerability (proof-of-concept only — no unnecessary data modification/deletion).
+5. If testing accidentally affects the stability of the container, it will be
+   restarted rather than treated as a "denial of service" finding, since availability
+   is explicitly out of scope.
+6. Traffic will be intercepted and inspected using Burp Suite Community Edition
+   configured to proxy only the local browser session used for this test —
+   not system-wide traffic.
+7. All evidence (requests, responses, screenshots, logs) will be sanitized before
+   being committed to the public GitHub repository (see Section 8).
+
+## 7. Testing Environment
+
+| Item | Detail |
+|---|---|
+| Location | Local machine only |
+| Network | Isolated — `localhost` only, no exposure to LAN/WAN |
+| Users | Synthetic test accounts created for this engagement |
+| Data | No real personal information at any point |
+| Tools | Docker, Burp Suite Community Edition, browser DevTools, curl, Postman |
+
+## 8. Data Handling and Evidence Sanitization
+
+Before any evidence is committed to the repository:
+
+- Session tokens, JWTs, and cookies will be truncated/replaced with placeholders
+  (e.g., `Authorization: Bearer <redacted>`).
+- Any coincidental real-looking data generated by the app's seed data will be
+  reviewed and redacted if ambiguous.
+- Screenshots will be checked for OS-level information (usernames, file paths,
+  browser profile names) and cropped/redacted accordingly.
+- No `.env` files, container IDs tied to a real host, or local IP addresses will
+  be published.
+
+## 9. Testing Window
+
+This is a self-paced portfolio project rather than a time-boxed client engagement.
+Testing will be conducted in local sessions, each logged with a date/time in
+`methodology.md`, between the project start date and the retest completion date.
+
+## 10. Points of Contact
+
+| Role | Name |
+|---|---|
+| Assessor | Muhammad Aqib Tayyab |
+| Authorizer | Muhammad Aqib Tayyab (self-authorized — owns the testing hardware and target) |
+
+## 11. Acceptance
+
+By proceeding with testing under this document, the assessor confirms understanding
+and acceptance of the scope, exclusions, and rules of engagement defined above.
+
+**Signed (self-authorization):** Muhammad Aqib Tayyab
+**Date:** _(fill in on the day testing begins)_
+
+---
+*This document should be the first commit in the repository, timestamped before any
+testing evidence, to demonstrate correct professional sequencing to anyone reviewing
+the project history.*
