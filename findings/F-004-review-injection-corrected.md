@@ -3,9 +3,9 @@
 | Field | Value |
 |---|---|
 | Finding ID | F-004 |
-| Title | Review Creation Endpoint Accepts Unvalidated `id` Field, Producing Orphaned Reviews With No Author |
-| Category | OWASP Top 10 — A04:2021 Insecure Design (input validation gap) / A08:2021 Software and Data Integrity Failures |
-| Severity | Low–Medium |
+| Title | Review Author Field Is Fully Client-Controlled (Identity Spoofing), Plus Orphaned/Unattributed Reviews via Unvalidated `id` Field |
+| Category | OWASP Top 10 — A04:2021 Insecure Design (missing server-side identity enforcement) / A08:2021 Software and Data Integrity Failures |
+| Severity | Medium |
 | Status | Confirmed |
 | Affected Component | `PUT /rest/products/:productId/reviews` |
 | Date Identified | 2026-09-29 |
@@ -89,13 +89,46 @@ application's self-reported challenge status.
 Full raw requests/responses saved in
 `evidence/requests-responses/F-004-review-injection.txt`.
 
+## Sub-Finding: Author Field Is Fully Client-Controlled (Confirmed, Not Hypothetical)
+
+The related concern flagged in the original Remediation section — whether the
+server trusts a client-supplied `author` value at all, even on ordinary review
+creation — was tested directly and **confirmed**:
+
+**Request** (authenticated as User A, `testuser-a@example.local`):
+```json
+PUT /rest/products/1/reviews
+Authorization: Bearer <User A's real, valid token>
+
+{"message":"Spoof-author-test","author":"totally-fake-person@example.local"}
+```
+
+**Result** — `201 Created`, and the review is persisted with the **spoofed**
+author, not the authenticated user's real identity:
+```json
+{"product":"1","message":"Spoof-author-test","author":"totally-fake-person@example.local","likesCount":0,"likedBy":[],"_id":"Ri8vS2m5Ry7oTDbuM"}
+```
+
+No cross-check against the session's actual email was performed at any point.
+This means **any logged-in user can publish a review that publicly displays as
+having been written by any arbitrary name or email address** — including a
+real third party's identity, a competitor, or a fabricated persona — entirely
+independent of the orphaned-review/`id`-field bug documented above. This is
+the more directly exploitable half of this finding: it requires no malformed
+`id` field, no edge-case body — just a normal review submission with one
+field's value changed.
+
 ## Impact
 
-- Any authenticated user can create reviews on any product with **no author
-  attribution**, which could be used to post spam, misleading claims, or
-  defamatory content that cannot be traced back to an account in the review
-  data itself — undermining the integrity/trust signal reviews are meant to
-  provide.
+- **Confirmed identity spoofing**: any authenticated user can make a review
+  appear to have been written by anyone else — a real customer, a company
+  representative, or a fabricated identity — with no verification against the
+  actual session. This is a direct impersonation/reputational-harm vector,
+  independent of the orphaned-review issue.
+- Any authenticated user can also create reviews on any product with **no
+  author attribution at all** (the orphaned-review path), which could be used
+  to post spam, misleading claims, or defamatory content that cannot be traced
+  back to any account in the review data itself.
 - The endpoint's silent acceptance of an unrecognized `id` field (rather than
   rejecting the request, or actually using it to look up a target record)
   indicates a broader **input validation gap**: extra, unexpected fields in
@@ -116,15 +149,14 @@ accepts whatever shape of object it is given.
 
 ## Remediation
 
-1. Explicitly validate and whitelist the fields accepted in the review-creation
+1. **Always derive `author` server-side from the authenticated session's
+   verified email/identity** — never accept or trust a client-supplied
+   `author` value under any circumstances. This is the primary fix; it
+   resolves both the spoofing sub-finding and ensures the orphaned-review case
+   can no longer produce an unattributed record either.
+2. Explicitly validate and whitelist the fields accepted in the review-creation
    request body; reject requests containing unrecognized fields (e.g., `id`)
    rather than silently accepting them.
-2. Always derive `author` server-side from the authenticated session — never
-   allow it to be absent, and never trust a client-supplied value for it
-   either (see also the client-supplied `author` field observed in normal
-   review creation, which is a separate, related hardening opportunity: the
-   server currently trusts whatever `author` string the client sends, rather
-   than deriving it from the session token).
 3. If an edit capability is intended to exist for reviews, implement and
    document it explicitly (with a real ownership check), rather than leaving
    the create endpoint to silently mishandle edit-shaped requests.
