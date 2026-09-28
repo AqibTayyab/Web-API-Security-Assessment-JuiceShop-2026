@@ -123,4 +123,6 @@ strings on a public GitHub repo.)*
 ## References
 
 - OWASP Top 10 2021 — A02: Cryptographic Failures
+- CWE-522: Insufficiently Protected Credentials (password hash transmitted to the client within the token)
+- CWE-200: Exposure of Sensitive Information to an Unauthorized Actor (deluxeToken and internal record metadata)
 - OWASP JWT Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
