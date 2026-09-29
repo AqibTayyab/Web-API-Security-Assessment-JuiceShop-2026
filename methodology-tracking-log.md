@@ -23,10 +23,11 @@ Last updated: 2026-09-29 (Session covering F-006 through in-progress Phase 7 tes
 | F-007 | SQL Injection — Full User Database Extraction | Critical | ✅ Written, committed |
 | F-008 | NoSQL Operator/Type Confusion in Reviews | Low | ✅ Written, committed |
 | F-009 | DOM-Based XSS via Search Query Parameter (+ confirmed missing CSP) | High | ✅ Written, committed |
-| F-010 | Missing/Inconsistent Security Headers (CSP, Feature-Policy, HSTS) | Low | ✅ Written — **confirm committed** |
-| F-011 | Verbose SQL Error Disclosure (`/api/Cards/`, `/api/Complaints/`) | Low | ✅ Written — **confirm committed** |
+| F-010 | Missing/Inconsistent Security Headers (CSP, Feature-Policy, HSTS) | Low | ✅ Written, committed, pushed (`9aa485d`) |
+| F-011 | Verbose SQL Error Disclosure (`/api/Cards/`, `/api/Complaints/`) | Low | ✅ Written, committed, pushed (`9aa485d`) |
+| F-012 | Missing RBAC on REST-Scaffolded Endpoints (`/api/Users`, `/api/Feedbacks`) | High | ✅ Written — **needs commit/push confirmation** |
 
-**Action needed:** verify F-010 and F-011 were actually `git push`ed (last explicit confirmation in this log was for F-009 only). Run `git log --oneline -- findings/` to check both files are present in history before treating them as "done."
+**Verified via `git log --oneline -- findings/`** — both files confirmed present in commit history as of `9aa485d`. Full commit chain checks out against this log (F-001 → F-011, 13 commits, no gaps). No action needed here.
 
 ---
 
@@ -57,11 +58,7 @@ These are real, useful results but were folded into related findings rather than
 
 3. **`PUT /api/Users/25`** (attempting self-role-escalation via a normal `PUT`) — tested with the real customer token. Result: `401 Unauthorized`, but with error `DECODER routines::unsupported` — an **OpenSSL key-parsing failure**, not a clean authorization rejection. This suggests either a broken/different JWT verification path specific to this one route, or a possible algorithm-confusion issue. **This result is NOT interpretable as evidence of role protection working** — it needs isolated follow-up before any conclusion is drawn. The forged-token version of this test was never sent, since the baseline itself didn't produce a clean, interpretable result.
 
-**Current state:** two real findings identified (items 1 and 2 above) but not yet written up. Item 3 is an open anomaly, not yet understood, not yet retested cleanly.
-
-**Decision made in-session, not yet executed:** write items 1 and 2 as a single combined finding (proposed ID: **F-012**, "Missing Role-Based Access Control on REST-Scaffolded Endpoints") since they share the same root cause — Sequelize's auto-generated REST routes (`/api/Users`, `/api/Feedbacks`, likely others) appear to have no role or ownership middleware applied at all, in contrast to the hand-written `/rest/*` routes which do enforce some checks (e.g., F-005's basket-read protection, the `/api/Cards/8` "Malicious activity detected" block).
-
-**This finding has NOT been written yet as of this log's last update.**
+**Current state:** items 1 and 2 above have now been written up as **F-012** (see Section 1). Item 3 remains an open, uninterpreted anomaly — not yet retested cleanly.
 
 ---
 
@@ -89,11 +86,11 @@ These are real, useful results but were folded into related findings rather than
 
 ## 6. Housekeeping Debt (not testing — paperwork)
 
-- [ ] Confirm F-010 and F-011 are actually committed and pushed to GitHub (not just downloaded locally)
+- [x] Confirm F-010 and F-011 are actually committed and pushed to GitHub — **verified via `git log`, commit `9aa485d`**
 - [ ] Regenerate `summary.md` once all of the above is finalized — **intentionally deferred until the end, per project decision**
 - [ ] Add the F-005 positive-control notes (basket read, card read) into F-005's file
 - [ ] Add the stack-trace disclosure note into F-011's file
-- [ ] Decide and write up F-012 (missing RBAC on REST-scaffolded endpoints) from Section 3, items 1–2
+- [x] Write up F-012 (missing RBAC on REST-scaffolded endpoints) — **needs commit/push confirmation, same as F-010/F-011 required earlier**
 
 ---
 
