@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🔐 Web & API Security Assessment
+#   Web & API Security Assessment
 ### OWASP Juice Shop | Full Black Box Penetration Test
 
 <br>
