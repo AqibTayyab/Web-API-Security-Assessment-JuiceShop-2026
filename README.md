@@ -206,3 +206,19 @@ Built as a self directed portfolio project to practice the full lifecycle of a p
 **If this was useful or interesting, a star on the repo is appreciated.**
 
 </div>
+
+<br>
+
+### Connect with Me
+
+<p align="center">
+  <img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=16&pause=1200&color=00FF41&background=0D1117&center=true&vCenter=true&width=550&lines=Let's+connect+and+build+something+secure.;Open+to+AppSec+%2F+Purple+Team+opportunities." alt="Typing SVG" />
+</p>
+
+<p align="center">
+  <a href="https://www.linkedin.com/in/muhammad-aqib-tayyab-ethical-hacker">LinkedIn</a> ·
+  <a href="https://github.com/AqibTayyab">GitHub</a> ·
+  <a href="https://www.youtube.com/@MuhammadAqibTayyab">YouTube</a> ·
+</p>
+
+<p align="center"><i>From AqibTayyab. Let's shift the focus from certificates to verifiable, shared knowledge.</i></p>
